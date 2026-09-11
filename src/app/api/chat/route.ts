@@ -1,7 +1,7 @@
 import {
   convertToModelMessages,
+  stepCountIs,
   streamText,
-  type UIMessage,
 } from "ai";
 
 import {
@@ -9,32 +9,34 @@ import {
   SYSTEM_PROMPT,
 } from "@/lib/ai";
 
+import { analyzeResumeTool } from "@/lib/tools";
+
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  try {
-    const { messages }: { messages: UIMessage[] } = await req.json();
+  const { messages } = await req.json();
 
-    const result = streamText({
-      model: careerAssistantModel,
-      system: SYSTEM_PROMPT,
-      messages: await convertToModelMessages(messages),
-    });
+  const result = streamText({
+    model: careerAssistantModel,
 
-    return result.toUIMessageStreamResponse();
-  } catch (error) {
-    console.error("Chat API error:", error);
+    system: `${SYSTEM_PROMPT}
 
-    return new Response(
-      JSON.stringify({
-        error: "Unable to generate a response. Please try again.",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  }
+You have access to an analyzeResume tool.
+
+When the user asks you to analyze, review, score, or improve a resume and provides resume content, use the analyzeResume tool.
+
+After receiving the tool result, briefly explain the result to the user.
+
+Do not invent resume information that was not provided.`,
+
+    messages: await convertToModelMessages(messages),
+
+    tools: {
+      analyzeResume: analyzeResumeTool,
+    },
+
+    stopWhen: stepCountIs(3),
+  });
+
+  return result.toUIMessageStreamResponse();
 }
