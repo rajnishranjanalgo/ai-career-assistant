@@ -13,7 +13,6 @@ import { analyzeResumeTool } from "@/lib/tools";
 
 export const maxDuration = 30;
 
-const MAX_MESSAGES = 20;
 const MAX_MESSAGE_LENGTH = 4000;
 
 export async function POST(req: Request) {
@@ -23,10 +22,6 @@ export async function POST(req: Request) {
     // Basic input protection to prevent oversized requests.
     if (!Array.isArray(messages)) {
       return new Response("Invalid messages format", { status: 400 });
-    }
-
-    if (messages.length > MAX_MESSAGES) {
-      return new Response("Too many messages", { status: 400 });
     }
 
     for (const message of messages) {
