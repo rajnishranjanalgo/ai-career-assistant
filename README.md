@@ -79,7 +79,8 @@ WAVE reported zero errors, zero contrast errors, and zero alerts.
 - Tailwind CSS
 - Vercel
 - Vercel AI SDK
-- Google Gemini
+- Groq
+- OpenAI GPT-OSS 20B
 - Zod
 - Vitest
 - React Testing Library
@@ -97,16 +98,16 @@ Next.js Frontend
 AI Chat API
 /src/app/api/chat/route.ts
   |
-  +--------------------+
-  |                    |
-  v                    v
-Google Gemini       analyzeResume
-AI Model              Tool
-  |                    |
-  +---------+----------+
-            |
-            v
-     Streaming Response
-            |
-            v
-       Chat Interface
+  +----------------------+
+  |                      |
+  v                      v
+Groq                 analyzeResume
+GPT-OSS 20B              Tool
+  |                      |
+  +----------+-----------+
+             |
+             v
+      Streaming Response
+             |
+             v
+        Chat Interface

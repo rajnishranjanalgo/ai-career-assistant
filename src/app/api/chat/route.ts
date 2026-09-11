@@ -70,7 +70,8 @@ Do not invent resume information that was not provided.`,
     });
 
     return result.toUIMessageStreamResponse();
-  } catch {
-    return new Response("Invalid request", { status: 400 });
+  } catch (error) {
+    console.error("Chat API error:", error);
+    return new Response("Chat request failed", { status: 500 });
   }
 }

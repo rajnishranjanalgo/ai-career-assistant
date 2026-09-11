@@ -1,8 +1,8 @@
-import { google } from "@ai-sdk/google";
+import { groq } from "@ai-sdk/groq";
 
-export const AI_MODEL = "gemini-3.6-flash";
+export const AI_MODEL = "openai/gpt-oss-20b";
 
-export const careerAssistantModel = google(AI_MODEL);
+export const careerAssistantModel = groq(AI_MODEL);
 
 export const SYSTEM_PROMPT = `
 You are CareerGuide, a helpful AI career assistant for students and job seekers.
