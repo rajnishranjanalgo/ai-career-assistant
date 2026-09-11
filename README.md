@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CareerGuide AI
 
-## Getting Started
+CareerGuide AI is an AI-powered career assistant for students and job seekers.
 
-First, run the development server:
+It helps users with career planning, resume improvement, interview preparation, skills and learning roadmaps, and job-search preparation.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Live Demo
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+https://ai-career-assistant-mocha.vercel.app
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### AI Career Assistant
 
-## Learn More
+Ask CareerGuide questions about:
 
-To learn more about Next.js, take a look at the following resources:
+- Career planning
+- Resume improvement
+- Interview preparation
+- Skills to learn
+- Learning roadmaps
+- Job-search preparation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The assistant provides practical, beginner-friendly responses through a streaming chat interface.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Resume Analysis
 
-## Deploy on Vercel
+CareerGuide includes an AI-powered `analyzeResume` tool that evaluates resume content and returns a structured analysis containing:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Resume score
+- Target role
+- Strengths
+- Weaknesses
+- Recommendations
+- Summary
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The result is displayed using a dedicated UI component.
+
+### Interview Preparation
+
+Users can ask the AI for:
+
+- Interview questions
+- Preparation strategies
+- Technical interview guidance
+- Behavioral interview guidance
+- Interview roadmaps
+
+### Error and Loading States
+
+The application handles common AI interaction states:
+
+- Loading / thinking state
+- Streaming response state
+- API errors
+- Retry functionality
+- Empty state
+- Stop response button
+
+## Screenshots
+
+### CareerGuide AI
+
+The application provides a responsive career assistant interface with suggested actions and an AI chat experience.
+
+![CareerGuide AI](./audit-screenshots/lighthouse-mobile-after.png)
+
+### Accessibility Audit
+
+WAVE reported zero errors, zero contrast errors, and zero alerts.
+
+![WAVE Accessibility Audit](./audit-screenshots/wave-accessibility.png)
+
+## Tech Stack
+
+- Next.js 16
+- React
+- TypeScript
+- Tailwind CSS
+- Vercel
+- Vercel AI SDK
+- Google Gemini
+- Zod
+- Vitest
+- React Testing Library
+- Playwright
+
+## Architecture
+
+```text
+User
+  |
+  v
+Next.js Frontend
+  |
+  v
+AI Chat API
+/src/app/api/chat/route.ts
+  |
+  +--------------------+
+  |                    |
+  v                    v
+Google Gemini       analyzeResume
+AI Model              Tool
+  |                    |
+  +---------+----------+
+            |
+            v
+     Streaming Response
+            |
+            v
+       Chat Interface
