@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
+import AnimatedActionButton from "@/components/AnimatedActionButton";
 
 type ResumeAnalysis = {
   score: number;
@@ -93,7 +94,6 @@ function ResumeAnalysisCard({
 }
 
 export default function Home() {
-  
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -374,6 +374,35 @@ export default function Home() {
 
             <div ref={messagesEndRef} />
 
+          </div>
+        </section>
+
+        {/* FE-AA1 Button Motion Demo */}
+        <section
+          aria-label="Button motion demo"
+          className="border-t border-slate-800 px-4 py-6 sm:px-6"
+        >
+          <div className="mx-auto max-w-3xl">
+            <h2 className="text-lg font-semibold">
+              Button Motion Demo
+            </h2>
+
+            <p className="mt-1 text-sm text-slate-400">
+              Test the complete button lifecycle: idle, loading,
+              success and error.
+            </p>
+
+            <div className="mt-4 flex flex-wrap gap-3">
+              <AnimatedActionButton mode="success" />
+              <AnimatedActionButton mode="error" />
+            </div>
+
+            <p className="mt-4 text-xs text-slate-500">
+              Motion uses short 200–300ms transitions for
+              responsive feedback. Error feedback uses a brief
+              shake, while reduced-motion preferences remove
+              animation but preserve state feedback.
+            </p>
           </div>
         </section>
 
