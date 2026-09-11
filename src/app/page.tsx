@@ -93,6 +93,7 @@ function ResumeAnalysisCard({
 }
 
 export default function Home() {
+  
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
