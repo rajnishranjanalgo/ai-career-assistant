@@ -96,7 +96,15 @@ export default function Home() {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { messages, sendMessage, status, stop } = useChat({
+  const {
+    messages,
+    sendMessage,
+    status,
+    stop,
+    error,
+    regenerate,
+    clearError,
+  } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
     }),
@@ -104,6 +112,9 @@ export default function Home() {
 
   const isLoading =
     status === "submitted" || status === "streaming";
+
+  const hasError =
+    status === "error" || error != null;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -122,6 +133,8 @@ export default function Home() {
       return;
     }
 
+    clearError();
+
     sendMessage({
       text,
     });
@@ -129,9 +142,14 @@ export default function Home() {
     setInput("");
   }
 
+  function handleSuggestion(text: string) {
+    setInput(text);
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col">
+
         {/* Header */}
         <header className="border-b border-slate-800 px-4 py-5 sm:px-6">
           <h1 className="text-2xl font-bold">
@@ -149,7 +167,8 @@ export default function Home() {
           aria-label="Career assistant conversation"
           className="flex-1 overflow-y-auto px-4 py-6 sm:px-6"
         >
-          {messages.length === 0 && (
+          {/* Empty State */}
+          {messages.length === 0 && !hasError && (
             <div className="mx-auto mt-16 max-w-xl text-center">
               <h2 className="text-xl font-semibold">
                 How can I help your career?
@@ -161,10 +180,11 @@ export default function Home() {
               </p>
 
               <div className="mt-6 grid gap-3 text-left sm:grid-cols-2">
+
                 <button
                   type="button"
                   onClick={() =>
-                    setInput(
+                    handleSuggestion(
                       "How can I improve my resume as a fresher?"
                     )
                   }
@@ -176,7 +196,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() =>
-                    setInput(
+                    handleSuggestion(
                       "Give me a 3-month roadmap to prepare for software engineering interviews."
                     )
                   }
@@ -184,11 +204,14 @@ export default function Home() {
                 >
                   Interview roadmap
                 </button>
+
               </div>
             </div>
           )}
 
           <div className="mx-auto max-w-3xl space-y-5">
+
+            {/* Messages */}
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -212,7 +235,9 @@ export default function Home() {
                   </div>
 
                   <div className="whitespace-pre-wrap text-sm leading-6">
+
                     {message.parts.map((part, index) => {
+
                       {/* Normal AI text */}
                       if (part.type === "text") {
                         return (
@@ -224,9 +249,10 @@ export default function Home() {
 
                       {/* FE-07 Resume Analysis Tool */}
                       if (
-                        part.type ===
-                        "tool-analyzeResume"
+                        part.type === "tool-analyzeResume"
                       ) {
+
+                        {/* Tool input streaming */}
                         if (
                           part.state ===
                           "input-streaming"
@@ -241,6 +267,7 @@ export default function Home() {
                           );
                         }
 
+                        {/* Tool input available */}
                         if (
                           part.state ===
                           "input-available"
@@ -255,6 +282,7 @@ export default function Home() {
                           );
                         }
 
+                        {/* Tool output available */}
                         if (
                           part.state ===
                           "output-available"
@@ -269,6 +297,7 @@ export default function Home() {
                           );
                         }
 
+                        {/* Tool output error */}
                         if (
                           part.state ===
                           "output-error"
@@ -279,8 +308,9 @@ export default function Home() {
                               role="alert"
                               className="mt-3 rounded-xl border border-red-500/30 bg-red-950/30 p-3 text-sm text-red-300"
                             >
-                              Resume analysis failed. Please
-                              try again.
+                              Resume analysis failed.
+                              Please check your resume
+                              content and try again.
                             </div>
                           );
                         }
@@ -288,11 +318,13 @@ export default function Home() {
 
                       return null;
                     })}
+
                   </div>
                 </div>
               </div>
             ))}
 
+            {/* AI Thinking State */}
             {status === "submitted" && (
               <div
                 className="flex justify-start"
@@ -305,7 +337,42 @@ export default function Home() {
               </div>
             )}
 
+            {/* FE-08 Error State */}
+            {hasError && (
+              <div
+                role="alert"
+                className="rounded-2xl border border-red-800 bg-red-950/40 p-4"
+              >
+                <div className="flex items-start justify-between gap-4">
+
+                  <div>
+                    <h3 className="font-semibold text-red-300">
+                      Something went wrong
+                    </h3>
+
+                    <p className="mt-1 text-sm text-red-200/80">
+                      CareerGuide could not complete your
+                      request. Please try again.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearError();
+                      regenerate();
+                    }}
+                    className="shrink-0 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold transition hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400"
+                  >
+                    Retry
+                  </button>
+
+                </div>
+              </div>
+            )}
+
             <div ref={messagesEndRef} />
+
           </div>
         </section>
 
@@ -315,6 +382,7 @@ export default function Home() {
             onSubmit={handleSubmit}
             className="mx-auto flex max-w-3xl gap-2"
           >
+
             <label
               htmlFor="career-message"
               className="sr-only"
@@ -352,6 +420,7 @@ export default function Home() {
                 Send
               </button>
             )}
+
           </form>
 
           <p className="mx-auto mt-2 max-w-3xl text-xs text-slate-500">
@@ -359,6 +428,7 @@ export default function Home() {
             Verify important career decisions independently.
           </p>
         </div>
+
       </div>
     </main>
   );
