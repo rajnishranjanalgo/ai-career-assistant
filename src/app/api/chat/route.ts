@@ -13,13 +13,44 @@ import { analyzeResumeTool } from "@/lib/tools";
 
 export const maxDuration = 30;
 
+const MAX_MESSAGES = 20;
+const MAX_MESSAGE_LENGTH = 4000;
+
 export async function POST(req: Request) {
-  const { messages } = await req.json();
+  try {
+    const { messages } = await req.json();
 
-  const result = streamText({
-    model: careerAssistantModel,
+    // Basic input protection to prevent oversized requests.
+    if (!Array.isArray(messages)) {
+      return new Response("Invalid messages format", { status: 400 });
+    }
 
-    system: `${SYSTEM_PROMPT}
+    if (messages.length > MAX_MESSAGES) {
+      return new Response("Too many messages", { status: 400 });
+    }
+
+    for (const message of messages) {
+      if (!message || typeof message !== "object") {
+        return new Response("Invalid message", { status: 400 });
+      }
+
+      if (Array.isArray(message.parts)) {
+        for (const part of message.parts) {
+          if (
+            part?.type === "text" &&
+            typeof part.text === "string" &&
+            part.text.length > MAX_MESSAGE_LENGTH
+          ) {
+            return new Response("Message is too long", { status: 400 });
+          }
+        }
+      }
+    }
+
+    const result = streamText({
+      model: careerAssistantModel,
+
+      system: `${SYSTEM_PROMPT}
 
 You have access to an analyzeResume tool.
 
@@ -29,14 +60,17 @@ After receiving the tool result, briefly explain the result to the user.
 
 Do not invent resume information that was not provided.`,
 
-    messages: await convertToModelMessages(messages),
+      messages: await convertToModelMessages(messages),
 
-    tools: {
-      analyzeResume: analyzeResumeTool,
-    },
+      tools: {
+        analyzeResume: analyzeResumeTool,
+      },
 
-    stopWhen: stepCountIs(3),
-  });
+      stopWhen: stepCountIs(3),
+    });
 
-  return result.toUIMessageStreamResponse();
+    return result.toUIMessageStreamResponse();
+  } catch {
+    return new Response("Invalid request", { status: 400 });
+  }
 }
