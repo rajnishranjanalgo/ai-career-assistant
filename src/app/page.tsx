@@ -128,7 +128,12 @@ export default function Home() {
   ) {
     event.preventDefault();
 
-    const text = input.trim();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    const text = String(
+      formData.get("message") ?? ""
+    ).trim();
 
     if (!text || isLoading) {
       return;
@@ -182,6 +187,7 @@ export default function Home() {
 
               <div className="mt-6 grid gap-3 text-left sm:grid-cols-2">
 
+                {/* Resume suggestion */}
                 <button
                   type="button"
                   onClick={() =>
@@ -194,6 +200,7 @@ export default function Home() {
                   Improve my resume
                 </button>
 
+                {/* Interview suggestion */}
                 <button
                   type="button"
                   onClick={() =>
@@ -249,9 +256,7 @@ export default function Home() {
                       }
 
                       {/* FE-07 Resume Analysis Tool */}
-                      if (
-                        part.type === "tool-analyzeResume"
-                      ) {
+                      if (part.type === "tool-analyzeResume") {
 
                         {/* Tool input streaming */}
                         if (
@@ -383,6 +388,7 @@ export default function Home() {
           className="border-t border-slate-800 px-4 py-6 sm:px-6"
         >
           <div className="mx-auto max-w-3xl">
+
             <h2 className="text-lg font-semibold">
               Button Motion Demo
             </h2>
@@ -403,6 +409,7 @@ export default function Home() {
               shake, while reduced-motion preferences remove
               animation but preserve state feedback.
             </p>
+
           </div>
         </section>
 
@@ -412,7 +419,6 @@ export default function Home() {
             onSubmit={handleSubmit}
             className="mx-auto flex max-w-3xl gap-2"
           >
-
             <label
               htmlFor="career-message"
               className="sr-only"
@@ -422,11 +428,18 @@ export default function Home() {
 
             <input
               id="career-message"
+              name="message"
+              type="text"
               value={input}
-              onChange={(event) =>
-                setInput(event.target.value)
-              }
+              onInput={(event) => {
+                setInput(event.currentTarget.value);
+              }}
+              onChange={(event) => {
+                setInput(event.currentTarget.value);
+              }}
               placeholder="Ask about your career..."
+              aria-label="Ask CareerGuide a question"
+              autoComplete="off"
               disabled={isLoading}
               className="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
             />
@@ -443,7 +456,7 @@ export default function Home() {
             ) : (
               <button
                 type="submit"
-                disabled={!input.trim()}
+                disabled={isLoading}
                 aria-label="Send message"
                 className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-40"
               >
